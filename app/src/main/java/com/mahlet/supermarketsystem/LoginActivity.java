@@ -50,6 +50,17 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 }
         );
+        findViewById(R.id.btnRegister).setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent=new Intent(LoginActivity.this,CustomerRegisterActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+        );
+
 
 
     }
