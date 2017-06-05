@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.mahlet.supermarketsystem.CustomerRegisterActivity"
-    tools:showIn="@layout/activity_customer_register">
+    tools:showIn="@layout/activity_customer_register"
+    android:background="@mipmap/super4"
+    >
 
     <TextView
         android:id="@+id/textView4"

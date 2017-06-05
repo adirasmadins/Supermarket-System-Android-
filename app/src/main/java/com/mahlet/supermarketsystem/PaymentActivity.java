@@ -1,5 +1,6 @@
 package com.mahlet.supermarketsystem;
 
+import android.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +9,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.kosalgeek.asynctask.AsyncResponse;
+import com.kosalgeek.asynctask.PostResponseAsyncTask;
+
+import java.util.HashMap;
 
 public class PaymentActivity extends AppCompatActivity {
 
@@ -15,6 +22,7 @@ public class PaymentActivity extends AppCompatActivity {
     EditText etLast;
     EditText etAccount;
     Button btnPay;
+    static double payment=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,5 +52,32 @@ public class PaymentActivity extends AppCompatActivity {
     }
     public void payNow(){
         Log.d("APP","Payment");
+        if(payment!=0){
+            HashMap map=new HashMap();
+            map.put("request","bank");
+            map.put("cost",payment);
+            map.put("account",etAccount.getText().toString());
+            map.put("name",etFirst.getText().toString()+" "+etLast.getText().toString());
+            map.put("items",Cart.toString(Cart.items));
+            AsyncResponse response=new AsyncResponse() {
+                @Override
+                public void processFinish(String s) {
+                    if(s==null){
+                        Toast.makeText(PaymentActivity.this,"Connection Failed", Toast.LENGTH_LONG).show();
+
+                    }
+                    else if(s.contains("error")){
+                        Toast.makeText(PaymentActivity.this,s,Toast.LENGTH_LONG).show();
+                    }
+                    else if(s.contains("true")){
+                        String[] parse=s.split(":");
+                        String balance=parse[1];
+                        Config.showDialog(PaymentActivity.this,"Transaction Succesfull","You ordered the items you selected succesfully, Your current balance is: "+balance,"Fine");
+                    }
+                }
+            };
+            PostResponseAsyncTask task=new PostResponseAsyncTask(this,map,response);
+            task.execute(Config.SERVER+"/server.php");
+        }
     }
 }

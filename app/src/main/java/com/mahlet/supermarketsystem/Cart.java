@@ -22,4 +22,11 @@ public class Cart {
         }
         return cost;
     }
+    public static String toString(HashMap map){
+        String data="";
+        for(String label:items.keySet()){
+            data+=";"+items.get(label);
+        }
+        return data;
+    }
 }

@@ -9,7 +9,7 @@ import android.content.DialogInterface;
  */
 
 public class Config {
-    public static final String SERVER="http://10.0.3.2:81/supermaket";
+    public static final String SERVER="http://192.168.43.254:81/supermaket";
     public static final String PORT="81";
  public static void showDialog(Context context,String title,String message,String okText){
      AlertDialog.Builder builder=new AlertDialog.Builder(context);

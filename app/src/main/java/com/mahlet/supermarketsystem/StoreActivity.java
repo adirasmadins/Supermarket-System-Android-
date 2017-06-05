@@ -90,7 +90,10 @@ public class StoreActivity extends AppCompatActivity {
          );
          builder.show();
      }
-
+    else{
+         double cost=Cart.getTotalCost();
+         PaymentActivity.payment=cost;
+     }
 
     }
     public void autoLoad(){

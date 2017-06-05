@@ -77,13 +77,21 @@ public class LoginActivity extends AppCompatActivity {
                   v.vibrate(500);
               }
               else if(s.contains("true")){
-                  Intent intent=new Intent(LoginActivity.this, StoreActivity.class);
-                  startActivity(intent);
+                  String[] result=s.split(":");
+                  String type=result[1];
+                  if(type.equalsIgnoreCase("customer")) {
+                      Intent intent = new Intent(LoginActivity.this, StoreActivity.class);
+                      startActivity(intent);
+                      loggedIn=true;
+                  }
+                  else{
+                      Toast.makeText(LoginActivity.this,"You can't Login as Admin using this app!",Toast.LENGTH_LONG).show();
+                  }
               }
             }
         };
         PostResponseAsyncTask task=new PostResponseAsyncTask(this,map,response);
-        task.execute(Config.SERVER+"server.php");
+        task.execute(Config.SERVER+"/login.php");
     }
 
 }

@@ -50,9 +50,7 @@ public class Item {
                     Toast.makeText(context,"No Image found for this item!",Toast.LENGTH_LONG).show();
                 else {
 
-                   //Bitmap bitmap=Bitmap.
-                    //Assing to global bitmap
-                    //return that bitmap
+
                 }
 
             }
