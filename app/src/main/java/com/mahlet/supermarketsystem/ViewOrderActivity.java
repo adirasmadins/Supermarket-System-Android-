@@ -25,4 +25,5 @@ public class ViewOrderActivity extends AppCompatActivity {
             }
         });
     }
+
 }
