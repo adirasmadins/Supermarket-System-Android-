@@ -1,5 +1,6 @@
 package com.mahlet.supermarketsystem;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -29,7 +30,6 @@ public class CustomerRegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_customer_register);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,33 +47,52 @@ public class CustomerRegisterActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        id=etID.getText().toString();
-                        fullName=etFullName.getText().toString();
-                        address=etAddress.getText().toString();
-                        email=etEmail.getText().toString();
-                        phone=etPhone.getText().toString();
+                        if(etID.getText().toString().isEmpty() || etID.getText().toString().isEmpty() || etID.getText().toString().isEmpty())
+                            Toast.makeText(CustomerRegisterActivity.this,"Please fill all required fields and try again!",Toast.LENGTH_LONG).show();
+                        else if(!isValid(etEmail.getText().toString()))
+                            Toast.makeText(etEmail.getContext(),"Invalid Email",Toast.LENGTH_LONG).show();
+                        else {
+                            id = etID.getText().toString();
+                            fullName = etFullName.getText().toString();
+                            address = etAddress.getText().toString();
+                            email = etEmail.getText().toString();
+                            phone = etPhone.getText().toString();
+                            AccountCreate.address = address;
+                            AccountCreate.name = fullName;
+                            AccountCreate.email = email;
+                            AccountCreate.phone = phone;
+                            AccountCreate.id=id;
+                            Intent intent = new Intent(CustomerRegisterActivity.this, AccountCreate.class);
+                            startActivity(intent);
+
+                            finish();
+                        }
+                    }
+                }
+        );
+
+        findViewById(R.id.btnBack).setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent=new Intent(CustomerRegisterActivity.this,LoginActivity.class);
+                        startActivity(intent);
+                        finish();
                     }
                 }
         );
     }
-   public void register(String id,String name,String address,String email,String phone){
-       HashMap map=new HashMap();
-       map.put("id",id);
-       map.put("name",name);
-       map.put("address",address);
-       map.put("email",email);
-       map.put("phone",phone);
-       AsyncResponse response=new AsyncResponse() {
-           @Override
-           public void processFinish(String s) {
-               if(s==null || s.isEmpty()){
-                   Log.d("Supermaket","Empty response");
-                   Toast.makeText(CustomerRegisterActivity.this,"Connection to server failed, please try again later",Toast.LENGTH_LONG).show();
-               }
-           }
-       };
-       PostResponseAsyncTask task=new PostResponseAsyncTask(this,map,response);
-       task.execute(Config.SERVER+"/server.php");
-
-   }
+  @Override
+    public void onBackPressed(){
+      Intent intent=new Intent(this,LoginActivity.class);
+      startActivity(intent);
+      finish();
+  }
+  public boolean isValid(String email){
+      boolean valid=false;
+      if(email.contains("@") && email.contains("."))
+          valid=true;
+      else valid=false;
+      return valid;
+  }
 }

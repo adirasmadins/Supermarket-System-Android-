@@ -1,8 +1,13 @@
 package com.mahlet.supermarketsystem;
 
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -27,7 +32,10 @@ import android.widget.Toast;
 import com.kosalgeek.asynctask.AsyncResponse;
 import com.kosalgeek.asynctask.PostResponseAsyncTask;
 
+import java.text.DateFormat;
 import java.util.HashMap;
+import java.io.File;
+
 
 public class StoreActivity extends AppCompatActivity {
 
@@ -40,7 +48,9 @@ public class StoreActivity extends AppCompatActivity {
     private TextView txtCart;
     private ImageView iconView;
     private Button btnBuy;
+
     public static HashMap hashMap=new HashMap();
+    public static int itemsCount=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +63,7 @@ public class StoreActivity extends AppCompatActivity {
         iconView=(ImageView)findViewById(R.id.iconView);
         txtCart=(TextView)findViewById(R.id.txtCart);
         btnBuy=(Button)findViewById(R.id.btnBuy);
+
         btnBuy.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -64,37 +75,86 @@ public class StoreActivity extends AppCompatActivity {
         autoLoad();
     }
     public void buy(){
-     if(!LoginActivity.loggedIn){
+
+         String message="\n";
+         int counter=1;
+         for(String key:Cart.items.keySet()){
+             String[] items=Cart.items.get(key);
+             message+=counter+". "+items[1]+" Price: "+items[4];
+             counter++;
+         }
         AlertDialog.Builder builder=new AlertDialog.Builder(this);
          builder.setTitle("Buy Items");
-         builder.setMessage("How do you want to pay? if you have an account please login or pay directly using paypal");
-         builder.setPositiveButton("Pay Directly",
+         builder.setMessage("You are going to order the following items"+message);
+         builder.setPositiveButton("Continue",
                  new DialogInterface.OnClickListener() {
                      @Override
                      public void onClick(DialogInterface dialog, int which) {
-                         Intent intent=new Intent(StoreActivity.this,PaymentActivity.class);
-                         startActivity(intent);
-                         finish();
+                         orderNow();
                      }
                  }
          );
-         builder.setNegativeButton("Login",
+         builder.setNegativeButton("Cancel",
                  new DialogInterface.OnClickListener() {
                      @Override
                      public void onClick(DialogInterface dialog, int which) {
-                         Intent intent=new Intent(StoreActivity.this,LoginActivity.class);
-                         startActivity(intent);
-                         finish();
+                         dialog.cancel();
                      }
                  }
          );
          builder.show();
-     }
-    else{
-         double cost=Cart.getTotalCost();
-         PaymentActivity.payment=cost;
-     }
 
+
+    }
+    public void orderNow(){
+      HashMap map=new HashMap();
+        map.put("request","order_now");
+        map.put("user",LoginActivity.username);
+        map.put("item",Cart.toString(Cart.items));
+        map.put("address","not applied");
+        map.put("date","2-2-2017");
+        AsyncResponse response=new AsyncResponse() {
+            @Override
+            public void processFinish(String s) {
+                if(s==null || s.isEmpty()){
+                    Toast.makeText(StoreActivity.this,"Error: Connection failed, please try again later!",Toast.LENGTH_LONG).show();
+                }
+                else if(s.contains("error") || s.contains("Error")){
+                    Toast.makeText(StoreActivity.this,"Error: "+s,Toast.LENGTH_LONG).show();
+                    Log.d("APP",s);
+                }
+                else if(s.contains("true")){
+                    Log.d("APP",s);
+                    String message="You ordered the items you selected succussfully, do you want to give us feedback or comment?";
+                    AlertDialog.Builder builder=new AlertDialog.Builder(StoreActivity.this);
+                    builder.setTitle("Order Completed");
+                    builder.setMessage(message);
+                    builder.setPositiveButton("Yes",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent=new Intent(StoreActivity.this,FeedbackActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }
+                    );
+                    builder.setNegativeButton("Not Now",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }
+                    );
+                    builder.setIcon(R.mipmap.ic_launcher);
+                    builder.show();
+                }
+                Log.d("APP","Response: "+s);
+            }
+        };
+        PostResponseAsyncTask task=new PostResponseAsyncTask(this,map,response);
+        task.execute(Config.SERVER+"/server.php");
     }
     public void autoLoad(){
         HashMap map=new HashMap();
@@ -150,6 +210,9 @@ public class StoreActivity extends AppCompatActivity {
                                     }
                                 }
                         );
+                        button.setPadding(5,5,5,5);
+                        tview.setPadding(5,5,5,5);
+                        iview.setPadding(5,5,5,5);
                         gridLayout.addView(iview);
                         gridLayout.addView(tview);
                         gridLayout.addView(button);
@@ -225,7 +288,7 @@ public class StoreActivity extends AppCompatActivity {
             String[] items = (String[]) hashMap.get(label);
             Cart.items.put(label, items);
 
-            Config.showDialog(this,"Message",label+" will has been added to cart","Got it");
+            Config.showDialog(this,"Message",label+"  has been added to cart","Got it");
             b.setText("Remove");
             b.setBackgroundResource(R.mipmap.add_cart);
         }

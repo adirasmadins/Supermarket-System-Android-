@@ -1,5 +1,7 @@
 package com.mahlet.supermarketsystem;
 
+import android.util.Log;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -25,8 +27,9 @@ public class Cart {
     public static String toString(HashMap map){
         String data="";
         for(String label:items.keySet()){
-            data+=";"+items.get(label);
+            data=items.get(label)[1]+";"+data;
         }
+        Log.d("APP","Data: "+data);
         return data;
     }
 }

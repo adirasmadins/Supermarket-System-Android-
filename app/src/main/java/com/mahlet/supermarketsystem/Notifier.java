@@ -1,8 +1,13 @@
 package com.mahlet.supermarketsystem;
 
-/**
- * Created by Alphageek on 6/9/2017.
- */
+
+import android.content.Context;
+
+import io.hypertrack.smart_scheduler.Job;
+import io.hypertrack.smart_scheduler.SmartScheduler;
 
 public class Notifier {
+    public void notifiy(){
+
+    }
 }

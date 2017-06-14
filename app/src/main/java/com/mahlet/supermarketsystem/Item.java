@@ -50,7 +50,6 @@ public class Item {
                     Toast.makeText(context,"No Image found for this item!",Toast.LENGTH_LONG).show();
                 else {
 
-
                 }
 
             }

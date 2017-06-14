@@ -28,7 +28,6 @@ public class PaymentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
         etFirst=(EditText)findViewById(R.id.etFirst);
-        etLast=(EditText)findViewById(R.id.etLast);
         etAccount=(EditText)findViewById(R.id.etAccount);
         btnPay=(Button)findViewById(R.id.btnPay);
         btnPay.setOnClickListener(
@@ -54,17 +53,21 @@ public class PaymentActivity extends AppCompatActivity {
         Log.d("APP","Payment");
         if(payment!=0){
             HashMap map=new HashMap();
+
+            Log.d("APP","Username: "+LoginActivity.username);
+            Log.d("APP","Cost: "+payment);
             map.put("request","bank");
-            map.put("cost",payment);
+            map.put("username",LoginActivity.username);
+            map.put("cost",String.valueOf(payment));
             map.put("account",etAccount.getText().toString());
-            map.put("name",etFirst.getText().toString()+" "+etLast.getText().toString());
+            map.put("name",etFirst.getText().toString());
             map.put("items",Cart.toString(Cart.items));
+            map.put("address",((EditText)findViewById(R.id.etAddressLine)).getText().toString());
             AsyncResponse response=new AsyncResponse() {
                 @Override
                 public void processFinish(String s) {
                     if(s==null){
                         Toast.makeText(PaymentActivity.this,"Connection Failed", Toast.LENGTH_LONG).show();
-
                     }
                     else if(s.contains("error")){
                         Toast.makeText(PaymentActivity.this,s,Toast.LENGTH_LONG).show();
@@ -73,6 +76,10 @@ public class PaymentActivity extends AppCompatActivity {
                         String[] parse=s.split(":");
                         String balance=parse[1];
                         Config.showDialog(PaymentActivity.this,"Transaction Succesfull","You ordered the items you selected succesfully, Your current balance is: "+balance,"Fine");
+                    }
+                    else{
+                        Toast.makeText(PaymentActivity.this,"Error: "+s,Toast.LENGTH_LONG).show();
+                        Log.d("APP","Result: "+s);
                     }
                 }
             };
